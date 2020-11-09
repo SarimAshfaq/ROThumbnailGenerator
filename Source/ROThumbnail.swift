@@ -10,7 +10,7 @@ import UIKit
 
 open class ROThumbnail {
     
-    open static let sharedInstance:ROThumbnail = ROThumbnail()
+    public static let sharedInstance:ROThumbnail = ROThumbnail()
     open var imageQuality:CGFloat = 1.0 // Default is 100% JPEG image quality
     fileprivate var supportedFiletypes:Dictionary<String, ROThumbnailGenerator> = [:]
     
@@ -38,11 +38,11 @@ open class ROThumbnail {
             supportedFiletypes[fileExtension.lowercased()] = thumbnailGenerator
         }
     }
-
+    
     /**
        Analyses the file extension of the given url and uses the corresponding ROThumbnailGenerator
     
-       - parameter url:NSURL: Defines the url you want to create a Thumbnail 
+       - parameter url:NSURL: Defines the url you want to create a Thumbnail
        - returns: UIImage It does create the created Thumbnail image
      */
     open func getThumbnail(_ url:URL) -> UIImage {
@@ -50,14 +50,11 @@ open class ROThumbnail {
         
         let appropriateThumbnailGenerator = supportedFiletypes[fileExtension.lowercased()] ?? DefaultThumbnailGenerator()
         var thumbnail = appropriateThumbnailGenerator.getThumbnail(url)
-
-        // Don't perform compression if image quality is set to 100%
-        if imageQuality < 1 {
-            // Image quality of the thumbnail is defined in the imageQuality variable, can be setted from outside
-            let jpeg:Data = UIImageJPEGRepresentation(thumbnail, imageQuality)!
-            thumbnail = UIImage(data: jpeg)!
-        }
-        
+         
+        // Image quality of the thumbnail is defined in the imageQuality variable, can be setted from outside
+        let jpeg:Data = thumbnail.jpegData(compressionQuality: imageQuality)!
+        thumbnail = UIImage(data: jpeg)!
+         
         
         return thumbnail
     }
